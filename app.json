@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "url",
+    "scheme": "fake_scheme",
     "slug": "url",
     "version": "1.0.0",
     "orientation": "portrait",
