@@ -51,6 +51,7 @@ export default function HomeScreen({ navigation }: any) {
 
         <View className='flex flex-row justify-start px-2 mt-8 '>
           <ScrollView horizontal={true}>
+            {/* funny silly commment */}
             {sampleData.map((item) => (
               <View key={item.id}>
                 <RecentItem location={item.location} date={item.date} />
