@@ -1,25 +1,70 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
+
 import HomeScreen from '../screens/Home';
 import CustomDrawer from '../components/HomeScreen/CustomDrawer';
 import ProfileScreen from '../screens/Profile';
+import CreateProfile from '../screens/CreateProfile';
+import Loading from '../screens/Loading';
+
+import { checkIfUserIsCreated, setUserContextData } from '../hooks/useFirebase';
+import { useUser } from '@clerk/clerk-expo';
+import { getContext } from '../utils/userContext';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigator() {
+  const { setIsFound, isFound, setCurrentUser } = getContext();
+  const [loading, setLoading] = useState<boolean>(false);
+  const { user } = useUser();
+
+  const setUp = async () => {
+    setLoading(true);
+    if (user) {
+      const email = user?.emailAddresses[0].emailAddress;
+      if (email) {
+        const result = await checkIfUserIsCreated(email);
+        if (result === 'found') {
+          setUserContextData(user.id, setCurrentUser);
+          setIsFound(true);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const setEverythingUp = async () => {
+      await setUp();
+      setLoading(false);
+    };
+
+    setEverythingUp();
+  }, []);
+
   return (
-    <Drawer.Navigator
-      initialRouteName='Home'
-      drawerContent={(props) => <CustomDrawer {...props} />}
-      screenOptions={{
-        drawerActiveBackgroundColor: 'white',
-        drawerActiveTintColor: '#FB2E01',
-        headerShown: false,
-      }}
-    >
-      <Drawer.Screen name='Home' component={HomeScreen} />
-      <Drawer.Screen name='Profile' component={ProfileScreen} />
-    </Drawer.Navigator>
+    <>
+      {loading && <Loading />}
+
+      {!loading && (
+        <Drawer.Navigator
+          drawerContent={(props) => <CustomDrawer {...props} />}
+          screenOptions={{
+            drawerActiveBackgroundColor: 'white',
+            drawerActiveTintColor: '#FB2E01',
+            headerShown: false,
+          }}
+        >
+          {isFound ? (
+            <>
+              <Drawer.Screen name='Home' component={HomeScreen} />
+              <Drawer.Screen name='Profile' component={ProfileScreen} />
+            </>
+          ) : (
+            <Drawer.Screen name='Sign Up' component={CreateProfile} />
+          )}
+        </Drawer.Navigator>
+      )}
+    </>
   );
 }
