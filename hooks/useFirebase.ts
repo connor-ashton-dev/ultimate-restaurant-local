@@ -5,14 +5,19 @@ import {
   addDoc,
   getDocs,
   getDoc,
+  updateDoc,
+  arrayUnion,
+  increment,
 } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import uuid from 'react-native-uuid';
 import { getContext, currentUserType } from '../utils/userContext';
 import { useUser } from '@clerk/clerk-expo';
+import { RecentItemType, RestaurantType } from '../types';
+import { clockRunning } from 'react-native-reanimated';
 
 export const checkIfUserIsCreated = async (email: string): Promise<string> => {
-  let myResult: string = 'not found';
+  let myResult = 'not found';
   const querySnapshot = await getDocs(collection(db, 'users'));
   querySnapshot.forEach((doc) => {
     const foundEmail = doc.data().email;
@@ -85,3 +90,105 @@ export const getLocationFromUUID = async (uuid: string): Promise<string> => {
     return 'ERROR';
   }
 };
+
+export const getUUIDfromRestaurantName = async (
+  name: string
+): Promise<string> => {
+  let myResult: string = 'not found';
+  try {
+    const snapshot = await getDocs(collection(db, 'restaurants'));
+    snapshot.forEach((doc) => {
+      const foundName = doc.data().name;
+      if (foundName === name) {
+        myResult = doc.data().uuid;
+      }
+    });
+  } catch (e) {
+    console.log('ERROR:', e);
+    return 'ERROR';
+  }
+
+  return Promise.resolve(myResult);
+};
+
+export const addRestaurantToRecents = async (
+  response: string,
+  currentUser: currentUserType
+) => {
+  const { uuid } = currentUser;
+  const date = new Date().toLocaleString().split(',')[0];
+  const recentRestaurant: RecentItemType = {
+    date: date,
+    uuid: response,
+  };
+  //get recents from firebase
+  try {
+    const ref = doc(db, 'users', uuid);
+    await updateDoc(ref, {
+      recents: arrayUnion(recentRestaurant),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addRestaurantToLeaderBoard = async (uuid: string) => {
+  await setDoc(doc(db, 'leaderboard', uuid), {});
+};
+
+export const createNewRestaurant = async (
+  name: string,
+  currentUser: currentUserType
+): Promise<string> => {
+  const myUUID = uuid.v4().toString();
+  const myRestaurant: RestaurantType = {
+    name: name,
+    uuid: myUUID,
+  };
+  try {
+    await setDoc(doc(db, 'restaurants', myUUID), myRestaurant);
+    await addRestaurantToRecents(myUUID, currentUser);
+    await addRestaurantToLeaderBoard(myUUID);
+    return myUUID;
+  } catch (e) {
+    console.error('error creating restaurant', e);
+    return 'ERROR';
+  }
+};
+
+export const addToLeaderBoard = async (
+  currentUser: currentUserType,
+  restaurantUUID: string
+) => {
+  const ref = doc(db, 'leaderboard', restaurantUUID);
+  const snapshot = await getDoc(ref);
+  const data = snapshot.data();
+  if (data) {
+    const user = data[currentUser.uuid];
+    if (user) {
+      //user exists
+      await updateDoc(ref, {
+        [currentUser.uuid]: increment(1),
+      });
+    } else {
+      //user does not exist
+      await setDoc(ref, {
+        [currentUser.uuid]: 1,
+      });
+    }
+  }
+};
+
+//TODO: THIS IS IMPORTANT
+export const checkIfDuplicateRequest = async (
+  currentUser: currentUserType,
+  uuid: string
+): Promise<boolean> => {
+  let eaten = false;
+
+  return eaten;
+};
+
+// export const getRestaurantsThatMatch = (restaurant: string) => {
+//
+// };

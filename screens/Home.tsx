@@ -19,12 +19,7 @@ import {
 } from '../hooks/useFirebase';
 import { getContext } from '../utils/userContext';
 import AddRestaurant from './AddRestaurant';
-
-type RecentItemType = {
-  // id: number;
-  location: string;
-  date: string;
-};
+import { RecentItemType } from '../types';
 
 type LeaderboardItemType = {
   id: number;
@@ -50,22 +45,22 @@ export default function HomeScreen({ navigation }: any) {
   const { currentUser } = getContext();
   const [recentData, setRecentData] = useState<RecentItemType[]>([]);
   const [recentsLoading, setRecentsLoading] = useState<boolean>(false);
-  const [showAddRestaurantModal, setAddRestaurantModal] =
+  const [showAddRestaurantModal, setShowAddRestaurantModal] =
     useState<boolean>(false);
 
   const populateRecentData = async () => {
+    setRecentData([]);
     const currentData = currentUser?.recents;
     if (currentData) {
       setRecentsLoading(true);
       for (let i = 0; i < currentData.length; i++) {
         const { date, uuid } = currentData[i];
         let location = await getLocationFromUUID(uuid);
-        console.log('LOCATION:', location);
         const myCurrentData: RecentItemType = {
-          location: location,
+          uuid: location,
           date: date,
         };
-        setRecentData((oldData) => [...oldData, myCurrentData]);
+        setRecentData((oldData) => [myCurrentData, ...oldData]);
       }
       setRecentsLoading(false);
     }
@@ -102,7 +97,7 @@ export default function HomeScreen({ navigation }: any) {
             <ScrollView horizontal={true}>
               {recentData.map((item: RecentItemType, idx) => (
                 <View key={idx}>
-                  <RecentItem location={item.location} date={item.date} />
+                  <RecentItem location={item.uuid} date={item.date} />
                 </View>
               ))}
             </ScrollView>
@@ -141,7 +136,7 @@ export default function HomeScreen({ navigation }: any) {
         </TouchableOpacity>
         <TouchableOpacity
           className='bg-white p-4 rounded-full shadow shadow-gray-800'
-          onPress={() => setAddRestaurantModal(true)}
+          onPress={() => setShowAddRestaurantModal(true)}
         >
           <Text>🍕</Text>
         </TouchableOpacity>
@@ -155,9 +150,13 @@ export default function HomeScreen({ navigation }: any) {
         animationType={'slide'}
         transparent={false}
         presentationStyle={'formSheet'}
-        onRequestClose={() => setAddRestaurantModal(false)}
+        onRequestClose={() => setShowAddRestaurantModal(false)}
       >
-        <AddRestaurant />
+        <AddRestaurant
+          setRecentData={setRecentData}
+          setShowAddRestaurantModal={setShowAddRestaurantModal}
+          currentUser={currentUser}
+        />
       </Modal>
     </View>
   );
