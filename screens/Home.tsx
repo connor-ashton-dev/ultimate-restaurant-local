@@ -2,9 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  // Text,
   TouchableOpacity,
-  // TextInput,
   ScrollView,
   Text,
   ActivityIndicator,
@@ -27,10 +25,6 @@ type LeaderboardItemType = {
   ranking: number;
 };
 
-// const recentData: RecentItemType[] = [
-// { id: 1, location: 'Betos', date: 'Monday' },
-// ];
-
 const leaderboardData: LeaderboardItemType[] = [
   { id: 1, restaurant: 'Betos', ranking: 2 },
   { id: 2, restaurant: 'McDonalds', ranking: 55 },
@@ -40,8 +34,6 @@ const leaderboardData: LeaderboardItemType[] = [
 ];
 
 export default function HomeScreen({ navigation }: any) {
-  // const { signOut } = useAuth();
-  // const { user } = useUser();
   const { currentUser } = getContext();
   const [recentData, setRecentData] = useState<RecentItemType[]>([]);
   const [recentsLoading, setRecentsLoading] = useState<boolean>(false);
