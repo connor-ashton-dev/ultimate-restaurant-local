@@ -117,7 +117,7 @@ export default function HomeScreen({ navigation }: any) {
             >
               <TitleText
                 text={`${item.restaurant}: #${item.ranking}`}
-                styles={'text-xl text-black pl-2'}
+                styles={'text-xl text-black ml-2'}
               />
             </View>
           ))}
