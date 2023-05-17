@@ -15,7 +15,7 @@ import TitleText from '../components/TitleText';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   // checkIfUserIsCreated,
-  getLocationFromUUID,
+  getAllRestuarants,
 } from '../hooks/useFirebase';
 import { getContext } from '../utils/userContext';
 import AddRestaurant from './AddRestaurant';
@@ -50,18 +50,12 @@ export default function HomeScreen({ navigation }: any) {
 
   const populateRecentData = async () => {
     setRecentData([]);
-    const currentData = currentUser?.recents;
-    if (currentData) {
-      setRecentsLoading(true);
-      for (let i = 0; i < currentData.length; i++) {
-        const { date, uuid } = currentData[i];
-        const location = await getLocationFromUUID(uuid);
-        const myCurrentData: RecentItemType = {
-          uuid: location,
-          date: date,
-        };
-        setRecentData((oldData) => [myCurrentData, ...oldData]);
-      }
+    setRecentsLoading(true);
+    if (currentUser) {
+      const recentRestaurants: RecentItemType[] | [] = await getAllRestuarants(
+        currentUser
+      );
+      setRecentData(recentRestaurants);
       setRecentsLoading(false);
     }
   };
@@ -132,21 +126,21 @@ export default function HomeScreen({ navigation }: any) {
       {/* NAV BAR */}
       <View className='h-24 w-full bg-custom-dark flex flex-row items-center justify-between px-8 mb-4 '>
         <TouchableOpacity
-          className='bg-white p-4 rounded-full shadow shadow-gray-800'
+          className=' flex items-center justify-center bg-white p-4 rounded-full shadow shadow-gray-800'
           onPress={() => {
             navigation.navigate('Social');
           }}
         >
-          <Text>👥</Text>
+          <Text className='text-xl p-0 m-0'>👥</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className='bg-white p-4 rounded-full shadow shadow-gray-800'
+          className=' flex items-center justify-center bg-white p-4 rounded-full shadow shadow-gray-800'
           onPress={() => setShowAddRestaurantModal(true)}
         >
-          <Text>🍕</Text>
+          <Text className='text-xl p-0 m-0'>🍕</Text>
         </TouchableOpacity>
-        <TouchableOpacity className='bg-white p-4 rounded-full shadow shadow-gray-800'>
-          <Text>🔎</Text>
+        <TouchableOpacity className=' flex items-center justify-center bg-white p-4 rounded-full shadow shadow-gray-800'>
+          <Text className='text-xl p-0 m-0'>🔎</Text>
         </TouchableOpacity>
       </View>
 
@@ -155,12 +149,16 @@ export default function HomeScreen({ navigation }: any) {
         animationType={'slide'}
         transparent={false}
         presentationStyle={'formSheet'}
-        onRequestClose={() => setShowAddRestaurantModal(false)}
+        onRequestClose={() => {
+          // populateRecentData();
+          setShowAddRestaurantModal(false);
+        }}
       >
         <AddRestaurant
           setRecentData={setRecentData}
           setShowAddRestaurantModal={setShowAddRestaurantModal}
           currentUser={currentUser}
+          populateRecentData={populateRecentData}
         />
       </Modal>
     </View>

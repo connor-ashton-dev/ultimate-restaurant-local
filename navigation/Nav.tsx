@@ -3,9 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 
 import LoginScreen from '../screens/Login';
-import HomeScreen from '../screens/Home';
+// import HomeScreen from '../screens/Home';
 import { RootStackParamList } from '../types';
-import LinkingConfiguration from './LinkingConfiguration';
+// import LinkingConfiguration from './LinkingConfiguration';
 import { ClerkLoaded, useUser } from '@clerk/clerk-expo';
 import DrawerNavigator from './HomeDrawerNavigator';
 import Social from '../screens/Social';
@@ -36,7 +36,11 @@ const RootNavigator = () => {
               options={{ headerShown: false }}
             />
 
-            <Stack.Screen name='Social' component={Social} />
+            <Stack.Screen
+              name='Social'
+              component={Social}
+              options={{ headerShown: false }}
+            />
           </>
         ) : (
           <>

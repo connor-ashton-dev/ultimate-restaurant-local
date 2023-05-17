@@ -20,7 +20,7 @@ export default function TitleText({ text, styles }: TitleTextProps) {
     return (
       <Text
         style={{ fontFamily: 'Bangers' }}
-        className={`${styles} uppercase tracking-widest`}
+        className={`${styles} uppercase tracking-widest px-1`}
       >
         {text}
       </Text>

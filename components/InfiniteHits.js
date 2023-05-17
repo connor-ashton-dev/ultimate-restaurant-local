@@ -16,6 +16,7 @@ export default function InfiniteHits({
   setRecentData,
   //eslint-disable-next-line
   setModal,
+  populateRecentData,
   ...props
 }) {
   const { hits, isLastPage, showMore } = useInfiniteHits(props);
@@ -35,15 +36,16 @@ export default function InfiniteHits({
         <TouchableOpacity
           className='my-4 w-full bg-white py-4 px-2 rounded-lg shadow'
           onPress={async () => {
-            const date = new Date().toLocaleString().split(',')[0];
-            const data = {
-              date: date,
-              uuid: item.name,
-            };
+            // const date = new Date().toLocaleString().split(',')[0];
+            // const data = {
+            //   date: date,
+            //   uuid: item.name,
+            // };
             await addRestaurantToRecents(item.uuid, currentUser);
             //update leaderboard
             await addToLeaderBoard(currentUser, item.uuid);
-            setRecentData((oldData) => [data, ...oldData]);
+            populateRecentData();
+            // setRecentData((oldData) => [data, ...oldData]);
             setModal(false);
           }}
         >

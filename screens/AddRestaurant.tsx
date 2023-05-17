@@ -18,12 +18,14 @@ type AddRestaurantPropTypes = {
   setRecentData: React.Dispatch<React.SetStateAction<RecentItemType[]>>;
   setShowAddRestaurantModal: React.Dispatch<React.SetStateAction<boolean>>;
   currentUser: currentUserType | undefined;
+  populateRecentData: () => void;
 };
 
 export default function AddRestaurant({
   setRecentData,
   setShowAddRestaurantModal,
   currentUser,
+  populateRecentData,
 }: AddRestaurantPropTypes) {
   const [myRestaurant, setMyRestaurant] = useState<string>('');
 
@@ -50,20 +52,23 @@ export default function AddRestaurant({
       //   restaurantUUID
       // );
       // console.log(hasEaten);
-      setShowAddRestaurantModal(false);
       if (restaurantUUID !== 'not found') {
         //Add restaurant to list
         await addRestaurantToRecents(restaurantUUID, currentUser);
         //update leaderboard
         await addToLeaderBoard(currentUser, restaurantUUID);
-        setRecentData((oldData) => [dataToSend, ...oldData]);
+        // setRecentData((oldData) => [dataToSend, ...oldData]);
+        populateRecentData();
+        setShowAddRestaurantModal(false);
       } else {
         // create a new restaurant
         const uuid = await createNewRestaurant(myRestaurant, currentUser);
         // update leaderboard
         if (uuid !== 'ERROR') {
           await addToLeaderBoard(currentUser, uuid);
-          setRecentData((oldData) => [dataToSend, ...oldData]);
+          // setRecentData((oldData) => [dataToSend, ...oldData]);
+          populateRecentData();
+          setShowAddRestaurantModal(false);
         }
       }
     }
@@ -82,6 +87,7 @@ export default function AddRestaurant({
             currentUser={currentUser}
             setRecentData={setRecentData}
             setModal={setShowAddRestaurantModal}
+            populateRecentData={populateRecentData}
           />
           <TouchableOpacity onPress={handleClick} className='mb-12 mt-4'>
             <Text className='text-white text-xl'>Not there? Create</Text>

@@ -3,22 +3,31 @@ import React, { useState } from 'react';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import TitleText from '../components/TitleText';
 import { createUser } from '../hooks/useFirebase';
-import { getContext } from '../utils/userContext';
+import { currentUserType, getContext } from '../utils/userContext';
 
 export default function CreateProfile() {
-  const { setIsFound } = getContext();
+  const { setIsFound, setCurrentUser } = getContext();
   const [username, setUsername] = useState('');
   //TODO: ZIP CODE VALIDATION
   const [zip, setZip] = useState('');
   const { user } = useUser();
 
   const handleSubmit = async () => {
-    const email = user?.emailAddresses[0].emailAddress;
-    const id = user?.id;
     if (user) {
+      const email = user.emailAddresses[0].emailAddress;
+      const id = user.id;
+      const url = user.profileImageUrl;
       if (email) {
         try {
-          await createUser(username, email, zip, id);
+          const myUser: currentUserType = {
+            username: username,
+            email: email,
+            zip: zip,
+            uuid: id,
+            url: url,
+            recents: [],
+          };
+          await createUser(myUser, setCurrentUser);
           setIsFound(true);
         } catch (e) {
           console.log('error in createUserScreen', e);

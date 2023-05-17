@@ -5,6 +5,7 @@ export type currentUserType = {
   username: string;
   uuid: string;
   zip: string;
+  url: string;
   recents: [];
 };
 

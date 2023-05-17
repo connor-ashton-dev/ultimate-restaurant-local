@@ -29,21 +29,24 @@ export const checkIfUserIsCreated = async (email: string): Promise<string> => {
 };
 
 export const createUser = async (
-  username: string,
-  email: string,
-  zipcode: string,
-  id: string
+  myUser: currentUserType,
+  setCurrentUser: React.Dispatch<
+    React.SetStateAction<currentUserType | undefined>
+  >
 ) => {
   try {
     //TODO: MAKE SURE YOU CAN'T DUPLICATE USERNAMES
 
-    await setDoc(doc(db, 'users', id), {
-      uuid: id,
-      email: email,
-      username: username,
-      zip: zipcode,
-      recents: {},
+    await setDoc(doc(db, 'users', myUser.uuid), {
+      uuid: myUser.uuid,
+      url: myUser.url,
+      email: myUser.email,
+      username: myUser.username,
+      zip: myUser.zip,
+      recents: myUser.recents,
     });
+    //set current user
+    setCurrentUser(myUser);
   } catch (e) {
     console.error('error creating user', e);
   }
@@ -55,7 +58,8 @@ export const setUserContextData = async (
   userId: string,
   setCurrentUser: React.Dispatch<
     React.SetStateAction<currentUserType | undefined>
-  >
+  >,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   //look in firebase
   try {
@@ -66,10 +70,12 @@ export const setUserContextData = async (
       zip: data?.zip,
       uuid: data?.uuid,
       email: data?.email,
+      url: data?.url,
       username: data?.username,
       recents: data?.recents,
     };
     setCurrentUser(firebaseUserData);
+    setLoading(false);
   } catch (e) {
     console.log('ERROR:', e);
   }
@@ -177,6 +183,29 @@ export const addToLeaderBoard = async (
       });
     }
   }
+};
+
+export const getAllRestuarants = async (
+  currentUser: currentUserType
+): Promise<RecentItemType[]> => {
+  const myReturnArray: RecentItemType[] = [];
+  const ref = doc(db, 'users', currentUser.uuid);
+  const snapshot = await getDoc(ref);
+  const data = snapshot.data();
+  if (data) {
+    for (let i = 0; i < data.recents.length; i++) {
+      const uuid = data.recents[i].uuid;
+      const date = data.recents[i].date;
+      const name = await getLocationFromUUID(uuid);
+      const myRecent: RecentItemType = {
+        uuid: name,
+        date: date,
+      };
+      myReturnArray.push(myRecent);
+    }
+  }
+
+  return Promise.resolve(myReturnArray.reverse());
 };
 
 //TODO: THIS IS IMPORTANT

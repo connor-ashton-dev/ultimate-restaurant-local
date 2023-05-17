@@ -14,7 +14,7 @@ import { getContext } from '../utils/userContext';
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigator() {
-  const { setIsFound, isFound, setCurrentUser } = getContext();
+  const { setIsFound, isFound, currentUser, setCurrentUser } = getContext();
   const [loading, setLoading] = useState<boolean>(false);
   const { user } = useUser();
 
@@ -25,17 +25,18 @@ export default function DrawerNavigator() {
       if (email) {
         const result = await checkIfUserIsCreated(email);
         if (result === 'found') {
-          setUserContextData(user.id, setCurrentUser);
-          setIsFound(true);
+          setUserContextData(user.id, setCurrentUser, setLoading);
+          // setIsFound(true);
         }
       }
+    } else {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     const setEverythingUp = async () => {
       await setUp();
-      setLoading(false);
     };
 
     setEverythingUp();
@@ -54,7 +55,7 @@ export default function DrawerNavigator() {
             headerShown: false,
           }}
         >
-          {isFound ? (
+          {currentUser?.username !== undefined ? (
             <>
               <Drawer.Screen name='Home' component={HomeScreen} />
               <Drawer.Screen name='Profile' component={ProfileScreen} />
