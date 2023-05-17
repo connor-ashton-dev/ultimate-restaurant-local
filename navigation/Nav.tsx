@@ -8,6 +8,7 @@ import { RootStackParamList } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
 import { ClerkLoaded, useUser } from '@clerk/clerk-expo';
 import DrawerNavigator from './HomeDrawerNavigator';
+import Social from '../screens/Social';
 
 export default function Navigation() {
   {
@@ -28,11 +29,15 @@ const RootNavigator = () => {
     <ClerkLoaded>
       <Stack.Navigator>
         {isSignedIn ? (
-          <Stack.Screen
-            name='HomeScreen'
-            component={DrawerNavigator}
-            options={{ headerShown: false }}
-          />
+          <>
+            <Stack.Screen
+              name='HomeScreen'
+              component={DrawerNavigator}
+              options={{ headerShown: false }}
+            />
+
+            <Stack.Screen name='Social' component={Social} />
+          </>
         ) : (
           <>
             <Stack.Screen

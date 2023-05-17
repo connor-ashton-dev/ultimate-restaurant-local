@@ -2,7 +2,7 @@ import {
   collection,
   doc,
   setDoc,
-  addDoc,
+  // addDoc,
   getDocs,
   getDoc,
   updateDoc,
@@ -11,10 +11,10 @@ import {
 } from 'firebase/firestore';
 import { db } from '../utils/firebase';
 import uuid from 'react-native-uuid';
-import { getContext, currentUserType } from '../utils/userContext';
-import { useUser } from '@clerk/clerk-expo';
+import { currentUserType } from '../utils/userContext';
+// import { useUser } from '@clerk/clerk-expo';
 import { RecentItemType, RestaurantType } from '../types';
-import { clockRunning } from 'react-native-reanimated';
+// import { clockRunning } from 'react-native-reanimated';
 
 export const checkIfUserIsCreated = async (email: string): Promise<string> => {
   let myResult = 'not found';
@@ -94,7 +94,7 @@ export const getLocationFromUUID = async (uuid: string): Promise<string> => {
 export const getUUIDfromRestaurantName = async (
   name: string
 ): Promise<string> => {
-  let myResult: string = 'not found';
+  let myResult = 'not found';
   try {
     const snapshot = await getDocs(collection(db, 'restaurants'));
     snapshot.forEach((doc) => {
@@ -180,15 +180,46 @@ export const addToLeaderBoard = async (
 };
 
 //TODO: THIS IS IMPORTANT
-export const checkIfDuplicateRequest = async (
-  currentUser: currentUserType,
-  uuid: string
-): Promise<boolean> => {
-  let eaten = false;
-
-  return eaten;
-};
+// export const checkIfDuplicateRequest = async (
+//   currentUser: currentUserType,
+//   uuid: string
+// ): Promise<boolean> => {
+//   const eaten = false;
+//
+//   return eaten;
+// };
 
 // export const getRestaurantsThatMatch = (restaurant: string) => {
 //
 // };
+
+export const getUserUUIDFromName = async (name: string): Promise<string> => {
+  let myResult = 'not found';
+  try {
+    const querySnapshot = await getDocs(collection(db, 'users'));
+    querySnapshot.forEach((doc) => {
+      const foundName = doc.data().username;
+      if (foundName === name) {
+        myResult = doc.data().uuid;
+      }
+    });
+  } catch (e) {
+    console.log('ERROR:', e);
+    return 'ERROR';
+  }
+
+  return Promise.resolve(myResult);
+};
+
+export const getFriendFromDB = async (
+  name: string
+): Promise<string | currentUserType> => {
+  let myResult: currentUserType | string = 'not found';
+  const UUID = await getUserUUIDFromName(name);
+  if (UUID !== 'not found') {
+    const ref = doc(db, 'users', UUID);
+    const snapshot = await getDoc(ref);
+    myResult = snapshot.data() as currentUserType;
+  }
+  return Promise.resolve(myResult);
+};

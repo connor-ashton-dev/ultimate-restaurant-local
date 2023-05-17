@@ -9,6 +9,7 @@ export default function SearchBox(props) {
 
   function setQuery(newQuery) {
     setInputValue(newQuery);
+    props.setMyRestaurant(newQuery);
     refine(newQuery);
   }
 
@@ -24,7 +25,8 @@ export default function SearchBox(props) {
     <View>
       <TextInput
         ref={inputRef}
-        className='w-52 border-2 my-4 border-white py-2 px-1 text-white'
+        className='w-64 border-2 my-4 border-white py-2 px-1 text-white'
+        style={{ fontSize: 20 }}
         placeholder='Restaurant name here'
         placeholderTextColor='white'
         value={inputValue}

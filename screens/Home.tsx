@@ -1,4 +1,4 @@
-import { useAuth, useUser } from '@clerk/clerk-expo';
+// import { useUser } from '@clerk/clerk-expo';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -14,7 +14,7 @@ import RecentItem from '../components/HomeScreen/RecentItem';
 import TitleText from '../components/TitleText';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
-  checkIfUserIsCreated,
+  // checkIfUserIsCreated,
   getLocationFromUUID,
 } from '../hooks/useFirebase';
 import { getContext } from '../utils/userContext';
@@ -41,7 +41,7 @@ const leaderboardData: LeaderboardItemType[] = [
 
 export default function HomeScreen({ navigation }: any) {
   // const { signOut } = useAuth();
-  const { user } = useUser();
+  // const { user } = useUser();
   const { currentUser } = getContext();
   const [recentData, setRecentData] = useState<RecentItemType[]>([]);
   const [recentsLoading, setRecentsLoading] = useState<boolean>(false);
@@ -55,7 +55,7 @@ export default function HomeScreen({ navigation }: any) {
       setRecentsLoading(true);
       for (let i = 0; i < currentData.length; i++) {
         const { date, uuid } = currentData[i];
-        let location = await getLocationFromUUID(uuid);
+        const location = await getLocationFromUUID(uuid);
         const myCurrentData: RecentItemType = {
           uuid: location,
           date: date,
@@ -131,7 +131,12 @@ export default function HomeScreen({ navigation }: any) {
       </ScrollView>
       {/* NAV BAR */}
       <View className='h-24 w-full bg-custom-dark flex flex-row items-center justify-between px-8 mb-4 '>
-        <TouchableOpacity className='bg-white p-4 rounded-full shadow shadow-gray-800'>
+        <TouchableOpacity
+          className='bg-white p-4 rounded-full shadow shadow-gray-800'
+          onPress={() => {
+            navigation.navigate('Social');
+          }}
+        >
           <Text>👥</Text>
         </TouchableOpacity>
         <TouchableOpacity
