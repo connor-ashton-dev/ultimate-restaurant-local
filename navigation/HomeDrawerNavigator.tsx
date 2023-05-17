@@ -27,6 +27,8 @@ export default function DrawerNavigator() {
         if (result === 'found') {
           setUserContextData(user.id, setCurrentUser, setLoading);
           // setIsFound(true);
+        } else {
+          setLoading(false);
         }
       }
     } else {
